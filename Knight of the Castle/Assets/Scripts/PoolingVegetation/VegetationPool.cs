@@ -6,14 +6,15 @@ public class VegetationPool
     private readonly GameObject prefab;
     private readonly Stack<GameObject> inactivePool;
     private readonly Transform parent;
+    private readonly int maxCapacity;
 
-    public VegetationPool(GameObject Currentprefab, int initialSize, Transform Currentparent)
+    public VegetationPool(GameObject currentPrefab, int initialSize, Transform currentParent)
     {
-        prefab = Currentprefab;
-        parent = Currentparent;
+        prefab = currentPrefab;
+        parent = currentParent;
+        maxCapacity = initialSize;
         inactivePool = new Stack<GameObject>(initialSize);
 
-        // Pre-warm pool in memory to avoid instantiation hit during gameplay
         for (int i = 0; i < initialSize; i++)
         {
             GameObject obj = Object.Instantiate(prefab, parent);
@@ -24,8 +25,13 @@ public class VegetationPool
 
     public GameObject Get(Vector3 position, Quaternion rotation, Vector3 scale)
     {
-        GameObject obj = inactivePool.Count > 0 ? inactivePool.Pop() : Object.Instantiate(prefab, parent);
+        // Strict cap: If pool is empty, return null instead of instantiating new objects
+        if (inactivePool.Count == 0)
+        {
+            return null;
+        }
 
+        GameObject obj = inactivePool.Pop();
         Transform t = obj.transform;
         t.SetPositionAndRotation(position, rotation);
         t.localScale = scale;
@@ -36,7 +42,18 @@ public class VegetationPool
 
     public void Release(GameObject obj)
     {
+        if (obj == null) return;
+
         obj.SetActive(false);
-        inactivePool.Push(obj);
+
+        // Ensure we don't exceed initial capacity if objects are freed
+        if (inactivePool.Count < maxCapacity)
+        {
+            inactivePool.Push(obj);
+        }
+        else
+        {
+            Object.Destroy(obj);
+        }
     }
 }

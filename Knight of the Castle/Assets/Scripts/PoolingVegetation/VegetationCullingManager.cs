@@ -8,8 +8,8 @@ public class VegetationCullingManager : MonoBehaviour
     {
         public string name;
         public GameObject prefab;
-        public Vector3 extents; // Half-size bounds offset (e.g., Tree = x:0.5, y:2.0, z:0.5)
-        public int initialPoolSize;
+        public Vector3 extents; // Half-size bounds offset
+        public int maxPoolSize; // Absolute max allowed instances on screen
     }
 
     public struct VegetationData
@@ -18,14 +18,18 @@ public class VegetationCullingManager : MonoBehaviour
         public Vector3 position;
         public Quaternion rotation;
         public Vector3 scale;
-        public Bounds bounds;          // Fast AABB struct
-        public GameObject activeInstance; // Reference to pooled GameObject (null when culled)
+        public Bounds bounds;
+        public GameObject activeInstance;
     }
 
     [Header("Camera & Culling Settings")]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private float maxDrawDistance = 80f;
-    [SerializeField] private float checkInterval = 0.05f; // Runs 20 times/sec instead of every frame
+    [SerializeField] private float checkInterval = 0.05f;
+
+    [Header("No-Spawn Zone Settings")]
+    [Tooltip("Layers representing zones where vegetation cannot spawn (e.g., Buildings, NoSpawnZones)")]
+    [SerializeField] private LayerMask exclusionLayerMask;
 
     [Header("Vegetation Definitions")]
     [SerializeField] private VegetationType[] vegetationTypes;
@@ -65,10 +69,7 @@ public class VegetationCullingManager : MonoBehaviour
         _lastCamPosition = currentCamPos;
         _lastCamRotation = currentCamRot;
 
-        // Recalculate camera frustum planes
         _frustumPlanes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
-
-        // Run optimized check loop
         EvaluateVegetationCulling(currentCamPos);
     }
 
@@ -80,24 +81,20 @@ public class VegetationCullingManager : MonoBehaviour
         {
             VegetationData data = _allVegetationData[i];
 
-            // OPTIMIZATION 2: Distance check using sqrMagnitude (faster than Vector3.Distance)
             float sqrDist = (data.position - camPos).sqrMagnitude;
             bool isWithinDistance = sqrDist <= sqrMaxDistance;
-
-            // OPTIMIZATION 3: AABB Frustum Check using lightweight struct Bounds
             bool isVisible = isWithinDistance && GeometryUtility.TestPlanesAABB(_frustumPlanes, data.bounds);
 
             if (isVisible)
             {
-                // Visible & Not Spawned -> Get from pool
                 if (data.activeInstance == null)
                 {
+                    // If pool limit is reached, Get() returns null and spawning is prevented
                     data.activeInstance = _pools[data.typeIndex].Get(data.position, data.rotation, data.scale);
                 }
             }
             else
             {
-                // Invisible & Currently Active -> Recycle back to pool
                 if (data.activeInstance != null)
                 {
                     _pools[data.typeIndex].Release(data.activeInstance);
@@ -105,16 +102,32 @@ public class VegetationCullingManager : MonoBehaviour
                 }
             }
 
-            _allVegetationData[i] = data; // Write struct back to list
+            _allVegetationData[i] = data;
         }
     }
 
     /// <summary>
-    /// Call this function from your custom terrain generator / world builders.
+    /// Checks whether a position collides with exclusion zones. Returns true if safe to spawn.
     /// </summary>
-    public void RegisterVegetationItem(int typeIndex, Vector3 pos, Quaternion rot, Vector3 scale)
+    public bool IsPositionValid(Vector3 position, Vector3 extents, Quaternion rotation)
+    {
+        if (exclusionLayerMask == 0) return true; // No mask configured
+
+        // Check if point collides with any exclusion colliders
+        Collider[] hitColliders = Physics.OverlapBox(position + new Vector3(0, extents.y, 0), extents, rotation, exclusionLayerMask);
+        return hitColliders.Length == 0;
+    }
+
+    public bool RegisterVegetationItem(int typeIndex, Vector3 pos, Quaternion rot, Vector3 scale)
     {
         Vector3 extents = Vector3.Scale(vegetationTypes[typeIndex].extents, scale);
+
+        // Check if position overlaps with an exclusion zone BoxCollider/Layer
+        if (!IsPositionValid(pos, extents, rot))
+        {
+            return false; // Registration blocked by exclusion zone
+        }
+
         Bounds aabbBounds = new Bounds(pos + new Vector3(0, extents.y, 0), extents * 2f);
 
         _allVegetationData.Add(new VegetationData
@@ -126,6 +139,8 @@ public class VegetationCullingManager : MonoBehaviour
             bounds = aabbBounds,
             activeInstance = null
         });
+
+        return true;
     }
 
     private void InitializePools()
@@ -139,7 +154,7 @@ public class VegetationCullingManager : MonoBehaviour
 
             _pools[i] = new VegetationPool(
                 vegetationTypes[i].prefab,
-                vegetationTypes[i].initialPoolSize,
+                vegetationTypes[i].maxPoolSize,
                 container.transform
             );
         }
