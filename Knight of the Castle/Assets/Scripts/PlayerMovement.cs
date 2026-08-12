@@ -10,16 +10,21 @@ public enum LerpType
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(CapsuleCollider))]
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour, IDamageable
 {
     [Header("Enum")]
     [SerializeField] private LerpType lerpType;
+
+    [Header("Health Setup")]
+    [SerializeField] private float maxHealth = 100f;
+    public float CurrentHealth { get; private set; }
+    public bool IsDead { get; private set; }
 
     [Header("Properties")]
     [SerializeField] private float PlayerSpeed = 8f;
     [SerializeField] private float PlayerAccSpeed = 50f;
     [SerializeField] private float PlayerDeccSpeed = 40f;
-    [SerializeField] private float rotationSpeed = 15f; // Speed of rotation toward movement direction
+    [SerializeField] private float rotationSpeed = 15f; 
 
     [Header("Inputs & State")]
     [SerializeField] private float moveX;
@@ -47,18 +52,25 @@ public class PlayerMovement : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotationX |
                          RigidbodyConstraints.FreezeRotationY |
                          RigidbodyConstraints.FreezeRotationZ;
+
+        CurrentHealth = maxHealth;
+        IsDead = false;
     }
 
     private void Update()
     {
+        if (IsDead) return;
+
         Inputs();
         Animate();
-        RotateTowardsMovement();
     }
 
     private void FixedUpdate()
     {
+        if (IsDead) return;
+
         Move();
+        RotateTowardsMovement();
     }
 
     private void Inputs()
@@ -110,10 +122,31 @@ public class PlayerMovement : MonoBehaviour
         if (inputDir.sqrMagnitude > 0.01f)
         {
             float targetAngle = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg;
-
             Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
 
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            // استخدام MoveRotation أفضل مع Rigidbody بدلاً من transform.rotation مباشر
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
         }
+    }
+
+    // تطبيق واجهة IDamageable
+    public void TakeDamage(float damage)
+    {
+        if (IsDead) return;
+
+        CurrentHealth -= damage;
+        Debug.Log($"Player hit! Current Health: {CurrentHealth}");
+
+        if (CurrentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        IsDead = true;
+        Debug.Log("Player Died!");
+        // أضف أنيميشن الموت أو كود إعادة التشغيل هنا
     }
 }

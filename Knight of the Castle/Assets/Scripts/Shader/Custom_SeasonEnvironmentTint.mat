@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _RandomColorVariation: 0.012
-    - _SeasonProgress: 0
+    - _SeasonProgress: 2.81
     - _SnowAmount: 0
     - _WindSpeed: 10
     - _WindStrength: 2
