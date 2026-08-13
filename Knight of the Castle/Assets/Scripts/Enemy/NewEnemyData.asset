@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb55a0bc3637aa546946a49e29509178, type: 3}
   m_Name: NewEnemyData
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  health: 0
-  damage: 0
-  speed: 0
-  attackRange: 0
-  detectionRange: 0
+  health: 100
+  damage: 10
+  speed: 3.5
+  attackRange: 2
+  detectionRange: 10
   enemySprite: {fileID: 0}
-  enemyColor: {r: 0, g: 0, b: 0, a: 0}
+  enemyColor: {r: 0.6603774, g: 0.16322534, b: 0.16322534, a: 0}
   attackSound: {fileID: 0}
   deathSound: {fileID: 0}
   canPatrol: 0
-  canChasePlayer: 0
+  canChasePlayer: 1
