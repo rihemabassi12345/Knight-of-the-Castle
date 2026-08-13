@@ -153,13 +153,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ca13a90c6be5ee46bbe089faf8b36b5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDetection
-  targetMask:
+  playerMask:
     serializedVersion: 2
     m_Bits: 64
-  obstacleMask:
+  towerMask:
     serializedVersion: 2
-    m_Bits: 256
-  viewAngle: 360
+    m_Bits: 128
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  targetCommitTime: 2
+  castlePriorityDistance: 5
 --- !u!114 &1468747888109918112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,6 +190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   baseData: {fileID: 11400000, guid: eb75d0746bf593f4cb180c8372e6a913, type: 2}
+  animator: {fileID: 5862669976217511778}
 --- !u!1001 &6540939647878779291
 PrefabInstance:
   m_ObjectHideFlags: 0

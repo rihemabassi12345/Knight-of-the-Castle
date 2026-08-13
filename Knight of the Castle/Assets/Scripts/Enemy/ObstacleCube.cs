@@ -9,6 +9,7 @@ public class ObstacleCube : MonoBehaviour, IDamageable
     [SerializeField] private float maxHealth = 100f;
     
     public float CurrentHealth { get; private set; }
+    public float targetHealth;
     public bool IsDead { get; private set; }
 
     private NavMeshObstacle navObstacle;
@@ -35,6 +36,7 @@ public class ObstacleCube : MonoBehaviour, IDamageable
         if (IsDead) return;
 
         CurrentHealth -= damage;
+        targetHealth = CurrentHealth;
 
         if (CurrentHealth <= 0)
         {

@@ -20,29 +20,32 @@ public class EnemyCombat : MonoBehaviour
         attackTimer = 0f;
     }
 
-    private void Update()
+private void Update()
+{
+    if (enemyController.IsDead) return;
+
+    // Attack the blocking obstacle if there is one, otherwise attack the castle directly
+    Transform target = enemyDetection.CurrentTarget != null
+        ? enemyDetection.CurrentTarget
+        : enemyDetection.UltimateTarget;
+
+    if (target == null) return;
+
+    Vector3 offset = target.position - transform.position;
+    float sqrLen = offset.sqrMagnitude;
+    float sqrAttackRange = enemyController.Data.attackRange * enemyController.Data.attackRange;
+
+    if (sqrLen <= sqrAttackRange)
     {
-        if (enemyController.IsDead) return;
+        attackTimer += Time.deltaTime;
 
-        Transform target = enemyDetection.CurrentTarget;
-        if (target == null) return;
-
-        // Optimization: مقارنة المربعات المربعة (SqredDistance) أسرع بـ 10 مرات من Vector3.Distance
-        Vector3 offset = target.position - transform.position;
-        float sqrLen = offset.sqrMagnitude;
-        float sqrAttackRange = enemyController.Data.attackRange * enemyController.Data.attackRange;
-
-        if (sqrLen <= sqrAttackRange)
+        if (attackTimer >= attackCooldown)
         {
-            attackTimer += Time.deltaTime;
-
-            if (attackTimer >= attackCooldown)
-            {
-                attackTimer = 0f;
-                AttackTarget(target);
-            }
+            attackTimer = 0f;
+            AttackTarget(target);
         }
     }
+}
 
     private void AttackTarget(Transform target)
     {
