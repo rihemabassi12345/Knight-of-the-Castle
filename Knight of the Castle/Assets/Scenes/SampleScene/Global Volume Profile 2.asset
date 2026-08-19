@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06437c1ff663d574d9447842ba0a72e4, type: 3}
   m_Name: ScreenSpaceLensFlare
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ScreenSpaceLensFlare
-  active: 1
+  active: 0
   intensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 0.59
   tintColor:
     m_OverrideState: 0
     m_Value: {r: 1, g: 1, b: 1, a: 1}
@@ -101,9 +101,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81180773991d8724ab7f2d216912b564, type: 3}
   m_Name: ChromaticAberration
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ChromaticAberration
-  active: 1
+  active: 0
   intensity:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
 --- !u!114 &-5905860006023614556
 MonoBehaviour:
@@ -120,13 +120,13 @@ MonoBehaviour:
   active: 1
   lift:
     m_OverrideState: 0
-    m_Value: {x: 1, y: 1, z: 1, w: 0}
+    m_Value: {x: 0.9706384, y: 0.9805208, z: 1, w: 0}
   gamma:
-    m_OverrideState: 0
-    m_Value: {x: 1, y: 1, z: 1, w: 0}
+    m_OverrideState: 1
+    m_Value: {x: 0.9661106, y: 1, z: 0.85953736, w: 0}
   gain:
     m_OverrideState: 0
-    m_Value: {x: 1, y: 1, z: 1, w: 0}
+    m_Value: {x: 0.9343449, y: 1, z: 0.9741429, w: 0}
 --- !u!114 &-1449642598008437110
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -242,19 +242,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.LensDistortion
   active: 1
   intensity:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: -0.22
   xMultiplier:
     m_OverrideState: 0
-    m_Value: 1
+    m_Value: 0
   yMultiplier:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   center:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {x: 0.5, y: 0.5}
   scale:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
 --- !u!114 &885555047146819361
 MonoBehaviour:
@@ -299,10 +299,10 @@ MonoBehaviour:
   active: 1
   temperature:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 10
   tint:
     m_OverrideState: 1
-    m_Value: 0
+    m_Value: 44
 --- !u!114 &2714492293227759004
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -402,11 +402,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e021b4c809a781e468c2988c016ebbea, type: 3}
   m_Name: ColorLookup
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.ColorLookup
-  active: 1
+  active: 0
   texture:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: {fileID: 0}
     dimension: 1
   contribution:
-    m_OverrideState: 0
-    m_Value: 0
+    m_OverrideState: 1
+    m_Value: 0.068

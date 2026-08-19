@@ -3,22 +3,33 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewEnemyData", menuName = "Enemy System/Enemy Data")]
 public class EnemyData : ScriptableObject
 {
-    [Header("Enemy Stats")]
-    public float health;
-    public float damage;
-    public float speed;
-    public float attackRange;
-    public float detectionRange;
+    [Header("Health")]
+    [Min(1f)]
+    public float health = 100f;
 
-    [Header("Enemy Visuals")]
-    public Sprite enemySprite;
-    public Color enemyColor;
+    [Header("Combat")]
+    [Min(0f)]
+    public float damage = 10f;
 
-    [Header("Enemy Audio")]
-    public AudioClip attackSound;
-    public AudioClip deathSound;
+    [Min(0.1f)]
+    public float attackRange = 2f;
 
-    [Header("Enemy Behavior")]
-    public bool canPatrol;
-    public bool canChasePlayer;
+    [Min(0.1f)]
+    public float attackCooldown = 1.5f;
+
+    [Header("Movement")]
+    [Min(0f)]
+    public float speed = 3.5f;
+
+    [Min(0f)]
+    public float stoppingDistance = 1.5f;
+
+    [Header("Detection")]
+    [Min(0f)]
+    public float detectionRange = 10f;
+
+    [Header("Behavior Flags")]
+    public bool canChasePlayer = true;
+    public bool canAttackCastle = true;
+    public bool canDestroyObstacles = true;
 }
