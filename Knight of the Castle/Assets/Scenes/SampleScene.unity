@@ -4131,7 +4131,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &555692945
 Transform:
   m_ObjectHideFlags: 0
@@ -5796,7 +5796,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803623241}
   m_Enabled: 1
-  serializedVersion: 13
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 0.8717932, g: 1, b: 0.19215685, a: 1}
   m_Intensity: 1
@@ -5848,7 +5848,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShapeRadius: 0
+  m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -6971,7 +6971,6 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -8002,6 +8001,84 @@ Transform:
   - {fileID: 1073936357}
   m_Father: {fileID: 957545559}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1210813600
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7391696928382154418}
+    m_Modifications:
+    - target: {fileID: 4895682697131115462, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8400479002217558220, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_Name
+      value: Sword
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2.6682026
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2.6682022
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2.6682026
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.006383737
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.99997455
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.00000030824023
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.0071378495
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.000000062233624
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+--- !u!4 &1210813601 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 9214276367934188150, guid: 45a63acd74a27754796efb104a6308a8, type: 3}
+  m_PrefabInstance: {fileID: 1210813600}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1231662784
 GameObject:
   m_ObjectHideFlags: 0
@@ -9239,7 +9316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 8695184821540286097}
-  offset: {x: 0, y: 12, z: -14}
+  offset: {x: 0, y: 20, z: -20}
   smoothTime: 0.3
   lookAheadDistance: 2
   lookAheadSpeed: 3
@@ -10658,7 +10735,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1527023208}
   m_Enabled: 1
-  serializedVersion: 13
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1.5
@@ -10710,7 +10787,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShapeRadius: 0
+  m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -12793,7 +12870,6 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
-  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -13359,7 +13435,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2005016392}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bca3af91a70899940b844ecccbd0d40b, type: 3}
   m_Name: 
@@ -13382,7 +13458,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lerpType: 1
-  maxHealth: 100
   PlayerSpeed: 8
   PlayerAccSpeed: 50
   PlayerDeccSpeed: 40
@@ -13391,6 +13466,7 @@ MonoBehaviour:
   moveY: 0
   rb: {fileID: 0}
   anim: {fileID: 2005016397}
+  swordPlayer: {fileID: 0}
   inputDir: {x: 0, y: 0}
   accelRate: 0
   targetVelocity: {x: 0, y: 0}
@@ -13476,14 +13552,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2005016392}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 816a4c5195dc4a64c9626c60789765e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Swordplayer
   attackSpeed: 0.8
   crossFadeDuration: 0.3
-  comboWindow: 1.5
   hit1StateNames:
   - hit1
   - hit1_B
@@ -14089,7 +14164,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2063948779}
   m_Enabled: 1
-  serializedVersion: 13
+  serializedVersion: 12
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
@@ -14141,7 +14216,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShapeRadius: 0
+  m_ShadowRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -14345,7 +14420,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2102617862
 Transform:
   m_ObjectHideFlags: 0
@@ -18842,6 +18917,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1210813601}
   - {fileID: 1010038137544134620}
   - {fileID: 728220638407662980}
   m_Father: {fileID: 6679514527569804498}
@@ -19466,13 +19542,14 @@ GameObject:
   - component: {fileID: 8695184821540286099}
   - component: {fileID: 8695184821540286098}
   - component: {fileID: 8695184821540286102}
+  - component: {fileID: 8695184821540286103}
   m_Layer: 6
   m_Name: 'Knight '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8477768162342710564
 Transform:
   m_ObjectHideFlags: 0
@@ -19675,7 +19752,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   lerpType: 1
-  maxHealth: 100
   PlayerSpeed: 8
   PlayerAccSpeed: 50
   PlayerDeccSpeed: 40
@@ -19684,6 +19760,7 @@ MonoBehaviour:
   moveY: 0
   rb: {fileID: 0}
   anim: {fileID: 0}
+  swordPlayer: {fileID: 0}
   inputDir: {x: 0, y: 0}
   accelRate: 0
   targetVelocity: {x: 0, y: 0}
@@ -19779,6 +19856,28 @@ MonoBehaviour:
   targetLayers:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8695184821540286103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8349761851184559147}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 816a4c5195dc4a64c9626c60789765e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Swordplayer
+  attackSpeed: 0.8
+  crossFadeDuration: 0.3
+  hit1StateNames:
+  - hit1
+  - hit1_B
+  - hit1_C
+  hit2StateNames:
+  - hit2
+  - hit2_B
+  - hit2_C
 --- !u!4 &8778189267120525624
 Transform:
   m_ObjectHideFlags: 0

@@ -10,90 +10,82 @@ public enum LerpType
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(CapsuleCollider))]
-public class PlayerMovement : MonoBehaviour, IDamageable
+public class PlayerMovement : MonoBehaviour
 {
     [Header("Enum")]
-    [SerializeField] private LerpType lerpType;
-
-    [Header("Health Setup")]
-    [SerializeField] private float maxHealth = 100f;
-    public float CurrentHealth { get; private set; }
-    public bool IsDead { get; private set; }
+    [SerializeField] private LerpType lerpType = LerpType.SmoothDamp;
 
     [Header("Properties")]
-    [SerializeField] private float PlayerSpeed = 8f;
-    [SerializeField] private float PlayerAccSpeed = 50f;
-    [SerializeField] private float PlayerDeccSpeed = 40f;
-    [SerializeField] private float rotationSpeed = 15f; 
-
-    [Header("Inputs & State")]
-    [SerializeField] private float moveX;
-    [SerializeField] private float moveY;
+    [SerializeField] private float playerSpeed = 8f;
+    [SerializeField] private float playerAccSpeed = 50f;
+    [SerializeField] private float playerDeccSpeed = 40f;
+    [SerializeField] private float rotationSpeed = 12f;
 
     [Header("References")]
     [SerializeField] private Rigidbody rb;
     [SerializeField] private Animator anim;
+    [SerializeField] private SwordPlayer swordPlayer;
 
-    [Header("Debug Velocity Info")]
-    [SerializeField] private Vector2 inputDir;
-    [SerializeField] private float accelRate;
-    [SerializeField] private Vector2 targetVelocity;
-    [SerializeField] private Vector2 currentVelocity;
-    [SerializeField] private Vector2 newVelocity;
-
+    private Vector2 inputDir;
+    private Vector2 targetVelocity;
+    private Vector2 currentVelocity;
+    private Vector2 newVelocity;
     private Vector2 currentVelocitySmoothing;
-    [SerializeField] private float moveSmoothTime = 0.1f;
+
+    [SerializeField] private float moveSmoothTime = 0.08f;
 
     private void Awake()
     {
         if (rb == null) rb = GetComponent<Rigidbody>();
         if (anim == null) anim = GetComponentInChildren<Animator>();
+        if (swordPlayer == null) swordPlayer = GetComponent<SwordPlayer>();
 
         rb.constraints = RigidbodyConstraints.FreezeRotationX |
                          RigidbodyConstraints.FreezeRotationY |
                          RigidbodyConstraints.FreezeRotationZ;
-
-        CurrentHealth = maxHealth;
-        IsDead = false;
     }
 
     private void Update()
     {
-        if (IsDead) return;
-
         Inputs();
         Animate();
+        RotateTowardsMovement();
     }
 
     private void FixedUpdate()
     {
-        if (IsDead) return;
-
         Move();
-        RotateTowardsMovement();
     }
 
     private void Inputs()
     {
-        moveX = Input.GetAxisRaw("Horizontal");
-        moveY = Input.GetAxisRaw("Vertical");
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
+        inputDir = new Vector2(moveX, moveY).normalized;
     }
 
     private void Move()
     {
-        inputDir = new Vector2(moveX, moveY).normalized;
-        targetVelocity = inputDir * PlayerSpeed;
+        float speedMultiplier = 1.0f;
 
-        accelRate = (inputDir.sqrMagnitude > 0.01f) ? PlayerAccSpeed : PlayerDeccSpeed;
+        // Apply movement modifier during combat instead of complete freeze
+        if (swordPlayer != null && swordPlayer.IsAttacking)
+        {
+            speedMultiplier = swordPlayer.movementMultiplierDuringAttack;
+        }
 
+        float effectiveSpeed = playerSpeed * speedMultiplier;
+        targetVelocity = inputDir * effectiveSpeed;
+
+        float accelRate = (inputDir.sqrMagnitude > 0.01f) ? playerAccSpeed : playerDeccSpeed;
         currentVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z);
 
-        ChangelerpType(lerpType);
+        ApplyLerpType(lerpType, accelRate);
 
         rb.linearVelocity = new Vector3(newVelocity.x, rb.linearVelocity.y, newVelocity.y);
     }
 
-    private void ChangelerpType(LerpType type)
+    private void ApplyLerpType(LerpType type, float accelRate)
     {
         switch (type)
         {
@@ -113,8 +105,9 @@ public class PlayerMovement : MonoBehaviour, IDamageable
     {
         if (anim == null) return;
 
+        // Drive leg locomotion based on actual horizontal movement
         float currentSpeed = new Vector2(rb.linearVelocity.x, rb.linearVelocity.z).magnitude;
-        anim.SetFloat("Speed", currentSpeed);
+        anim.SetFloat("Speed", Mathf.Lerp(anim.GetFloat("Speed"), currentSpeed, Time.deltaTime * 10f));
     }
 
     private void RotateTowardsMovement()
@@ -124,29 +117,12 @@ public class PlayerMovement : MonoBehaviour, IDamageable
             float targetAngle = Mathf.Atan2(inputDir.x, inputDir.y) * Mathf.Rad2Deg;
             Quaternion targetRotation = Quaternion.Euler(0f, targetAngle, 0f);
 
-            // استخدام MoveRotation أفضل مع Rigidbody بدلاً من transform.rotation مباشر
-            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime));
+            // Slightly reduce rotation speed during swings for heavy feeling
+            float activeRotSpeed = (swordPlayer != null && swordPlayer.IsAttacking)
+                ? rotationSpeed * 0.65f
+                : rotationSpeed;
+
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, activeRotSpeed * Time.deltaTime);
         }
-    }
-
-    // تطبيق واجهة IDamageable
-    public void TakeDamage(float damage)
-    {
-        if (IsDead) return;
-
-        CurrentHealth -= damage;
-        Debug.Log($"Player hit! Current Health: {CurrentHealth}");
-
-        if (CurrentHealth <= 0)
-        {
-            Die();
-        }
-    }
-
-    private void Die()
-    {
-        IsDead = true;
-        Debug.Log("Player Died!");
-        // أضف أنيميشن الموت أو كود إعادة التشغيل هنا
     }
 }
