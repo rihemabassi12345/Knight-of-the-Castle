@@ -1,40 +1,33 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using System.Collections;
 
 public class EnemyDetection : MonoBehaviour
 {
     public enum TargetType
     {
         None,
-        KingPlayer,
-        DefenseTower,
+        DefenseObject,
         Castle
     }
 
-    [Header("Detection Layers")]
-    [SerializeField] private LayerMask playerMask;
-    [SerializeField] private LayerMask towerMask;
-    [SerializeField] private LayerMask obstacleLayerMask; // For Line of Sight blocking
+    [Header("Trigger Detection Bounds")]
+    [SerializeField] private Vector3 triggerBoxSize = new Vector3(2.5f, 2f, 3f);
+    [SerializeField] private Vector3 triggerBoxOffset = new Vector3(0f, 1f, 1.5f);
+    [SerializeField] private LayerMask defenseLayer; // أضف طبقة الدفاعات من الـ Inspector
 
-    [Header("Behavior Tuning")]
-    [SerializeField] private float targetCommitTime = 2.0f;
-    [SerializeField] private float castlePriorityDistance = 5.0f;
+    public EnemyController enemyController;
+    public NavMeshAgent agent;
 
-    private EnemyController enemyController;
-    private NavMeshAgent agent;
-    
-    private Transform ultimateTarget; // The Castle
-    private Transform currentTarget;
-    private TargetType currentTargetType = TargetType.None;
-    private float targetLockTimer;
+    public Transform ultimateTarget;
+    public Transform currentTarget;
+    public TargetType currentTargetType = TargetType.None;
+
+    public List<Transform> detectedDefenses = new List<Transform>();
 
     public Transform CurrentTarget => currentTarget;
     public Transform UltimateTarget => ultimateTarget;
     public TargetType CurrentTargetType => currentTargetType;
-
-    private WaitForSeconds delayWait = new WaitForSeconds(0.2f);
-    private Collider[] detectionBuffer = new Collider[10];
 
     private void Awake()
     {
@@ -45,174 +38,146 @@ public class EnemyDetection : MonoBehaviour
     public void SetupDetection(Transform castleTransform)
     {
         ultimateTarget = castleTransform;
-        currentTarget = null;
-        currentTargetType = TargetType.None;
-        targetLockTimer = 0f;
+        currentTarget = castleTransform; // ضبط القلعة كهدف مبدئي
+        currentTargetType = TargetType.Castle;
+        detectedDefenses.Clear();
 
-        StopAllCoroutines();
-        StartCoroutine(EvaluateTargetRoutine());
+        Debug.Log($"<color=cyan>[Detection Setup]</color> {gameObject.name} initialized with Castle: {castleTransform.name}");
     }
 
     private void Update()
     {
         if (enemyController == null || enemyController.IsDead || !agent.enabled) return;
 
-        // Manage commitment lock duration
-        if (targetLockTimer > 0f)
+        // فحص مستمر بالأوفرلاب للتأكد من إلتقاط أي دفاع داخل النطاق
+        ScanForDefenses();
+        
+        EvaluateTargets();
+        UpdateMovementDestination();
+    }
+
+    private void ScanForDefenses()
+    {
+        // حساب مركز وحجم مربع الاستشعار بالـ World Space
+        Vector3 center = transform.TransformPoint(triggerBoxOffset);
+        Vector3 halfExtents = triggerBoxSize / 2f;
+
+        // جلب كل الكائنات داخل النطاق
+        Collider[] hits = Physics.OverlapBox(center, halfExtents, transform.rotation, defenseLayer);
+
+        foreach (Collider hit in hits)
         {
-            targetLockTimer -= Time.deltaTime;
+            RegisterPotentialTarget(hit);
+        }
+    }
+
+    private void RegisterPotentialTarget(Collider other)
+    {
+        if (other == null || other.gameObject == gameObject || other.transform.root == transform.root) return;
+        if (ultimateTarget != null && other.transform == ultimateTarget) return;
+
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null && !damageable.IsDead)
+        {
+            if (!detectedDefenses.Contains(other.transform))
+            {
+                detectedDefenses.Add(other.transform);
+                Debug.Log($"<color=yellow>[Detected]</color> {gameObject.name} registered: <b>{other.gameObject.name}</b>");
+            }
+        }
+    }
+
+    private void EvaluateTargets()
+    {
+        // 1. تنظيف القائمة من الأهداف المدمرة
+        for (int i = detectedDefenses.Count - 1; i >= 0; i--)
+        {
+            Transform t = detectedDefenses[i];
+            if (t == null || !t.gameObject.activeInHierarchy || IsTargetDead(t))
+            {
+                detectedDefenses.RemoveAt(i);
+            }
         }
 
-        // Drop target safely if it gets destroyed or goes out of physical evaluation
-        if (currentTarget != null && !TargetIsValid(currentTarget, currentTargetType))
+        // 2. الثبات على الهدف الحالي إذا كان لا يزال حياً
+        if (currentTarget != null && currentTargetType == TargetType.DefenseObject)
         {
-            ForceClearTarget();
+            if (!IsTargetDead(currentTarget) && currentTarget.gameObject.activeInHierarchy)
+            {
+                return;
+            }
+            else
+            {
+                currentTarget = null;
+                currentTargetType = TargetType.None;
+            }
         }
 
-        // Command NavMeshAgent execution
+        // 3. اختيار أقرب دفاع
+        Transform closestDefense = GetClosestDefense();
+
+        if (closestDefense != null)
+        {
+            if (currentTarget != closestDefense)
+            {
+                currentTarget = closestDefense;
+                currentTargetType = TargetType.DefenseObject;
+                Debug.Log($"<color=magenta>[Target Locked]</color> {gameObject.name} attacking defense: <b>{currentTarget.name}</b>");
+            }
+        }
+        else
+        {
+            // 4. العودة إلى القلعة عند عدم وجود دفاعات
+            if (currentTarget != ultimateTarget)
+            {
+                currentTarget = ultimateTarget;
+                currentTargetType = TargetType.Castle;
+            }
+        }
+    }
+
+    private Transform GetClosestDefense()
+    {
+        Transform closest = null;
+        float minDistance = Mathf.Infinity;
+
+        foreach (Transform defense in detectedDefenses)
+        {
+            if (defense == null) continue;
+
+            float dist = Vector3.Distance(transform.position, defense.position);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closest = defense;
+            }
+        }
+
+        return closest;
+    }
+
+    private bool IsTargetDead(Transform target)
+    {
+        if (target == null) return true;
+        IDamageable damageable = target.GetComponent<IDamageable>();
+        return damageable == null || damageable.IsDead;
+    }
+
+    private void UpdateMovementDestination()
+    {
         Transform destination = currentTarget != null ? currentTarget : ultimateTarget;
-        if (destination != null)
+
+        if (destination != null && agent.isOnNavMesh)
         {
             agent.SetDestination(destination.position);
         }
     }
 
-    private IEnumerator EvaluateTargetRoutine()
+    private void OnDrawGizmosSelected()
     {
-        while (enemyController != null && !enemyController.IsDead)
-        {
-            yield return delayWait;
-            EvaluateTarget();
-        }
-    }
-
-    private void EvaluateTarget()
-    {
-        if (ultimateTarget == null) return;
-
-        float distanceToCastle = Vector3.Distance(transform.position, ultimateTarget.position);
-
-        // Rule 6: Castle Proximity Has Higher Priority
-        if (distanceToCastle <= castlePriorityDistance)
-        {
-            CommitTarget(ultimateTarget, TargetType.Castle);
-            return;
-        }
-
-        // If target lock is active and target remains clean/valid, stick with it
-        if (targetLockTimer > 0f && currentTarget != null && TargetIsValid(currentTarget, currentTargetType))
-        {
-            return;
-        }
-
-        // Collect prospective environmental targets
-        Transform visiblePlayer = FindTargetInLayer(playerMask);
-        Transform visibleTower = FindTargetInLayer(towerMask);
-
-        // Priority Hierarchy Evaluation
-        // Priority 1: Immediate Valid Player
-        if (visiblePlayer != null)
-        {
-            CommitTarget(visiblePlayer, TargetType.KingPlayer);
-            return;
-        }
-
-        // Priority 2 & 3: Committed Tower or newly detected Tower
-        if (visibleTower != null)
-        {
-            CommitTarget(visibleTower, TargetType.DefenseTower);
-            return;
-        }
-
-        // Priority 5: Fallback default objective (Castle)
-        CommitTarget(ultimateTarget, TargetType.Castle);
-    }
-
-    private void CommitTarget(Transform newTarget, TargetType type)
-    {
-        if (currentTarget == newTarget && currentTargetType == type) return;
-
-        currentTarget = newTarget;
-        currentTargetType = type;
-        
-        // Lock applies to transient tactical threats (Player, Towers) to prevent frame flickering
-        if (type == TargetType.KingPlayer || type == TargetType.DefenseTower)
-        {
-            targetLockTimer = targetCommitTime;
-        }
-        else
-        {
-            targetLockTimer = 0f;
-        }
-    }
-
-    private void ForceClearTarget()
-    {
-        currentTarget = null;
-        currentTargetType = TargetType.None;
-        targetLockTimer = 0f;
-    }
-
-    private Transform FindTargetInLayer(LayerMask mask)
-    {
-        float range = enemyController.Data.detectionRange;
-        int count = Physics.OverlapSphereNonAlloc(transform.position, range, detectionBuffer, mask);
-
-        Transform closestTarget = null;
-        float minDistance = Mathf.Infinity;
-
-        for (int i = 0; i < count; i++)
-        {
-            Transform targetTrans = detectionBuffer[i].transform;
-            IDamageable damageable = targetTrans.GetComponent<IDamageable>();
-
-            if (damageable != null && !damageable.IsDead)
-            {
-                if (HasLineOfSight(targetTrans, range))
-                {
-                    float dist = Vector3.Distance(transform.position, targetTrans.position);
-                    if (dist < minDistance)
-                    {
-                        minDistance = dist;
-                        closestTarget = targetTrans;
-                    }
-                }
-            }
-        }
-        return closestTarget;
-    }
-
-    private bool HasLineOfSight(Transform target, float checkRange)
-    {
-        Vector3 startPos = transform.position + Vector3.up * 0.5f;
-        Vector3 targetPos = target.position + Vector3.up * 0.5f;
-        Vector3 direction = targetPos - startPos;
-        float distance = direction.magnitude;
-
-        if (distance > checkRange) return false;
-
-        // Returns true if there are no intervening layout colliders marked under obstacleLayerMask
-        if (Physics.Raycast(startPos, direction.normalized, distance, obstacleLayerMask))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    private bool TargetIsValid(Transform target, TargetType type)
-    {
-        if (target == null) return false;
-
-        IDamageable damageable = target.GetComponent<IDamageable>();
-        if (damageable == null || damageable.IsDead) return false;
-
-        // Castle is universally clean/valid until destroyed
-        if (type == TargetType.Castle) return true;
-
-        // Players and Defense Towers must remain within operational detection bounds
-        float actualDistance = Vector3.Distance(transform.position, target.position);
-        if (actualDistance > enemyController.Data.detectionRange) return false;
-
-        return true;
+        Gizmos.color = Color.red;
+        Matrix4x4 localMatrix = Matrix4x4.TRS(transform.position, transform.rotation, transform.lossyScale);
+        Gizmos.matrix = localMatrix;
+        Gizmos.DrawWireCube(triggerBoxOffset, triggerBoxSize);
     }
 }
