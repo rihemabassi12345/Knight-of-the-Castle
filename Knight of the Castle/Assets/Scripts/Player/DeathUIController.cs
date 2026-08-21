@@ -44,7 +44,7 @@ public class DeathUIController : MonoBehaviour
         if (blackOverlayImage != null)
         {
             Color c = Color.black;
-            c.a = 0.3f;
+            c.a = 0.7f;
             blackOverlayImage.color = c;
         }
     }
