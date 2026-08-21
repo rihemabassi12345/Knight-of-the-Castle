@@ -137,6 +137,8 @@ public class DayNightManager : MonoBehaviour
 
         if (timerCoroutine != null) StopCoroutine(timerCoroutine);
         timerCoroutine = StartCoroutine(RunTimer());
+
+        GameEvents.TriggerPrepPhaseStart(prepDuration);
     }
 
     public void StartDayPhase()
@@ -157,6 +159,8 @@ public class DayNightManager : MonoBehaviour
 
         if (timerCoroutine != null) StopCoroutine(timerCoroutine);
         timerCoroutine = StartCoroutine(RunTimer());
+
+        GameEvents.TriggerDayPhaseStart(dayDuration);
     }
 
     private IEnumerator RunTimer()
