@@ -112,8 +112,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.6145678, y: 4.8387275, z: 1}
+  m_Center: {x: -0.007879025, y: -0.49761322, z: -3.7408797e-16}
 --- !u!208 &5349140473082383269
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -143,3 +143,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObstacleCube
   maxHealth: 100
+  targetHealth: 0
